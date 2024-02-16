@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Школа Ресо приглашает</title>
+
+    <style>
+        html,body{
+         
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #292929;
+        }
+
+
+        *{
+            box-sizing: border-box;
+        }
+
+        a{
+            text-decoration: none;
+            color: green;
+            font-weight: 500;
+        }
+
+
+        .content_code{
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 20px;
+            border:1px solid grey;
+            border-radius: 10px;
+        }
+
+        .content_code > div{
+            margin: 0;
+            flex-grow:1;
+        } 
+
+        .content_code > div > h4{
+            margin: 0;
+            margin-bottom: 10px;
+            text-align: right;
+            color: #292929;
+            opacity: .5;
+        }
+
+        .content_code > div > pre{
+            margin: 0;
+            white-space: pre-line;
+        }
+
+        .constrols{
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .button{
+            display: inline-block;
+            outline: none;
+            background-color: transparent;
+            vertical-align: middle;
+            text-align: center;
+            border: 1px solid #292929;
+            padding:10px 30px;
+            max-width: max-content;
+            min-height: auto;
+            border-radius: 5px;
+            color:#292929;
+            background-color: #aaaaaa;
+            cursor: pointer;
+        }
+
+        .button:hover:not(:disabled){
+            color: #ffffff;
+            background-color: #292929;
+        }
+
+        .button:disabled{
+            opacity: .4;
+        }
+
+        .search-container{
+            display: flex;
+            justify-content: end;
+            gap: 10px;
+        }
+
+        .search-container > [name=searchList]{
+            padding:10px 20px;
+            border: 1px solid #292929;   
+            border-radius: 5px;  
+        }
+
+   
+
+    </style> 
+
+</head>
+<body>
+    
+    <div class="search-container">
+        <select name="searchList"></select>
+        <button id="search" class="button">Выбрать дату</button>
+    </div>
+
+    <p>
+        <b>ID: </b>
+        <span class="ID"></span>
+    </p>
+    <p>
+        <b>дата обновления: </b>
+        <span class="date"></span>
+    </p>
+
+    <div class="content_code">
+        <div>
+            <h4>Школа Ресо приглашает (разметка)</h4>
+            <pre >
+                <code class="tempLayout_block">
+
+                </code>
+            </pre>
+        </div>
+
+
+    </div>
+
+    <div class="constrols">
+        <button class="btn-prew button">предыдущая дата</button>
+
+        <button class="btn-next button">слудующая дата</button>
+    </div>
+
+
+      <script src="./data.js"></script>
+      <script>
+            let tempLayout_block = `
+                <div class="">
+                        <p class="text-bold mt-2">{%title%}</p> 
+                        <div class="whom-text mb-2">
+                            {%forWhom%}
+                            <br />
+                            {%textLink%}
+                        </div>
+                        <div class="color-gray mb-2">
+                            <small>Лекторы: {%lectorsList%}</small>
+                        </div>
+                        <div class="color-gray">
+                            <small>{%date%} ({%time%})</small>
+                        </div>
+                </div>
+           `
+
+
+            let tempLayout_slider = `
+                <div class="">
+                        <p class="text-bold mt-2">{%title%}</p> 
+                        <div class="whom-text mb-2">
+                            {%forWhom%}
+                            <br />
+                            {%textLink%}
+                        </div>
+                        <div class="color-gray mb-2">
+                            <small>Лекторы: {%lectorsList%}</small>
+                        </div>
+                        <div class="color-gray">
+                            <small>{%date%} ({%time%})</small>
+                        </div>
+                </div>
+            `
+
+        const tempBloc = document.querySelector('.tempLayout_block')
+
+    
+
+
+        function getMarkupCode(dataList, template, count, blockOuter){
+
+                const itemList = dataList[count]
+
+                for (const key in itemList) {
+                    if (itemList.hasOwnProperty(key)) {
+                        if(key == 'dateUpdate'){
+                            document.querySelector('.date').textContent = itemList[key]
+                        }
+                        if(key == 'id'){
+                            document.querySelector('.ID').textContent = itemList[key]
+                        }
+                
+                        template = template.replaceAll(`\{%${key}%\}`, itemList[key]);
+                    }
+                }
+
+                blockOuter.textContent = template
+                
+                if(counter == 0){
+                    document.querySelector('.btn-prew').disabled = true
+                }
+
+                if(counter == dataList.length - 1){
+                    document.querySelector('.btn-next').disabled = true
+                }
+        }
+
+        let counter = 0
+        getMarkupCode(datas, tempLayout_block, counter, tempBloc)
+
+
+        document.querySelector('.btn-next').addEventListener('click', (evt) => {
+            document.querySelector('.btn-prew').disabled = false
+            counter++
+            getMarkupCode(datas, tempLayout_block, counter, tempBloc)
+        })
+
+        document.querySelector('.btn-prew').addEventListener('click', (evt) => {
+            document.querySelector('.btn-next').disabled = false     
+            counter--
+            getMarkupCode(datas, tempLayout_block, counter, tempBloc)
+        })
+
+        let item = 0
+        function getListDataId(dataList){
+            const selectElement =  document.querySelector('[name=searchList]')
+
+            for(let i = 0; i < datas.length; i++){
+
+                item++
+                if((i % 3) == 0){
+                    item = 1
+                }
+               
+                for (const key in datas[i]) {
+                    if(key == 'dateUpdate'){
+                        const optionElement = document.createElement('option')
+                        optionElement.setAttribute('value', i)
+                        optionElement.textContent = `[${item}]  ${datas[i][key]}`
+                        selectElement.appendChild(optionElement)
+                    }
+                }
+            }
+        }
+
+        getListDataId(datas)
+
+
+        document.querySelector('#search').addEventListener('click', (evt) => {
+            counter = document.querySelector('[name=searchList]').value
+
+            getMarkupCode(datas, tempLayout_block, counter, tempBloc)
+
+            if(counter == 0){
+                document.querySelector('.btn-prew').disabled = true
+                document.querySelector('.btn-next').disabled = false
+            }else if(counter == datas.length - 1){
+                document.querySelector('.btn-next').disabled = true
+                document.querySelector('.btn-prew').disabled = false
+            }else{
+                document.querySelector('.btn-prew').disabled = false
+                document.querySelector('.btn-next').disabled = false
+            }
+        })
+      </script>
+</body>
+</html>
